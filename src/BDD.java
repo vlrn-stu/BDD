@@ -1,5 +1,6 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class BDD {
@@ -8,9 +9,33 @@ public class BDD {
 		final String function = reduceFunction(formatInput(bfunkcia, poradie));
 		final Node root = new Node(function, "" + poradie.charAt(0),null);
 		final ArrayDeque<Node> queue = new ArrayDeque<>();
+		final ArrayList<Node> allNodes  = new ArrayList<Node>();
 		queue.add(root);
 		while (!queue.isEmpty()) {
 			final Node current = queue.remove();
+			Boolean skip = false;
+			int count = 0;
+			for(Node node:allNodes)
+			{
+				if(node.getFunction().equals(current.getFunction()))
+				{
+					
+						System.out.println("Current: "+current.getFunction() + " matches :" + node.getFunction());
+						if(current.getParent().getLeft().equals(current))
+						{
+							current.getParent().setLeft(node);
+						}
+						else
+						{
+							current.getParent().setRight(node);
+						}
+						skip = true;
+				}
+			}
+			if(skip)
+			{
+				continue;
+			}
 			Node left = null;
 			Node right = null;
 			final String leftFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol().toLowerCase());
@@ -63,12 +88,15 @@ public class BDD {
 				}
 				current.setLeft(left);
 				current.setRight(right);
+				allNodes.add(current);
 			}
 			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol());
 			System.out.println("Left: " + left.getFunction());
 			System.out.println("Right: " + right.getFunction());
 		}
-		return new BDD(root);
+		char charArray[] = poradie.toCharArray();
+	    Arrays.sort(charArray);
+		return new BDD(root, new String(charArray));
 	}
 
 	private static String formatInput(final String function, final String order) {
@@ -187,8 +215,9 @@ public class BDD {
 
 	private final int nodeCount = 0;
 
-	public BDD(final Node root) {
+	public BDD(final Node root, final String order) {
 		this.root = root;
+		this.order = order;
 	}
 	
 	public void printTree()
@@ -199,7 +228,7 @@ public class BDD {
 		while(!queue.isEmpty())
 		{
 			current = queue.remove();
-			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol());
+			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol() + " Instance: " + current.toString());
 			System.out.println("Left: " + current.getLeft().getFunction());
 			System.out.println("Right: " + current.getRight().getFunction());
 			if(current.getLeft().getFunction() != "0" && current.getLeft().getFunction()!= "1")
