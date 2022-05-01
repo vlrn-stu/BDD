@@ -7,18 +7,17 @@ public class BDD {
 
 	public static BDD BDD_create(final String bfunkcia, final String poradie) {
 		final String function = reduceFunction(formatInput(bfunkcia, poradie));
-		final Node root = new Node(function, "" + poradie.charAt(0), null);
+		Node root = new Node(function, "" + poradie.charAt(0), null);
 		final ArrayDeque<Node> queue = new ArrayDeque<>();
 		final ArrayList<Node> allNodes = new ArrayList<>();
 		queue.add(root);
 		while (!queue.isEmpty()) {
 			final Node current = queue.remove();
+			
+			//If already exists just point the parent to it
 			boolean skip = false;
-			final int count = 0;
 			for (final Node node : allNodes) {
 				if (node.getFunction().equals(current.getFunction())) {
-
-					System.out.println("Current: " + current.getFunction() + " matches :" + node.getFunction());
 					if (current.getParent().getLeft().equals(current)) {
 						current.getParent().setLeft(node);
 					} else {
@@ -30,10 +29,12 @@ public class BDD {
 			if (skip) {
 				continue;
 			}
+			
 			Node left = null;
 			Node right = null;
 			final String leftFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol().toLowerCase());
 			final String rightFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol());
+			//If the left function is a termination add no symbol, else find next symbol found in fuction
 			if ((leftFunction == "0") || (leftFunction == "1")) {
 				left = new Node(leftFunction, "*", current);
 			} else {
@@ -46,6 +47,7 @@ public class BDD {
 					}
 				}
 			}
+			//If the right function is a termination add no symbol, else find next symbol found in fuction
 			if ((rightFunction == "0") || (rightFunction == "1")) {
 				right = new Node(rightFunction, "*", current);
 			} else {
@@ -58,6 +60,7 @@ public class BDD {
 					}
 				}
 			}
+			//If the same function is for the left and right
 			if (left.getFunction().equals(right.getFunction())) {
 				if (!left.getFunction().equals("0") && !left.getFunction().equals("1")) {
 					queue.add(left);
@@ -69,10 +72,16 @@ public class BDD {
 						current.getParent().setRight(left);
 					}
 				}
+				else
+				{
+					root = left;
+				}
 			} else {
+				//If left isn't terminating
 				if (!left.getFunction().equals("0") && !left.getFunction().equals("1")) {
 					queue.add(left);
 				}
+				//If right isn't terminating
 				if (!right.getFunction().equals("1") && !right.getFunction().equals("0")) {
 					queue.add(right);
 				}
@@ -94,6 +103,7 @@ public class BDD {
 	}
 
 	private static String formatInput(final String function, final String order) {
+		//Just cleaning up the formating to match what we used
 		String correctFormat = function;
 		correctFormat = correctFormat.replace(".", "");
 		correctFormat = correctFormat.replace("(", "");
@@ -119,13 +129,16 @@ public class BDD {
 		}
 		divided.add(tmp);
 		String followingFunction = "";
+		//If symbol matches
 		if (reduced.equals(symbol)) {
 			return "1";
 		}
+		//If symbol is positive and function is negated
 		else if(reduced.equals(symbol.toLowerCase()))
 		{
 			return "0";
 		}
+		//If symbol is negative and function is positive
 		if (reduced.equals(symbol.toUpperCase())) {
 			return "0";
 		}
@@ -147,6 +160,7 @@ public class BDD {
 			followingFunction = followingFunction.replace(symbol, "");
 			return followingFunction;
 		}
+		//No else needed here as all possible routes from previous if lead to a return.
 		if ((divided.indexOf(symbol) != -1) && (divided.get(divided.indexOf(symbol)).length() < 2)) {
 			return "1";
 		}
@@ -181,6 +195,7 @@ public class BDD {
 		for (final String element : divided) {
 			if (element.length() == 1) {
 				for (int i = 0; i < divided.size(); i++) {
+					//Absorption
 					if ((divided.get(i).length() > 1) && divided.get(i).contains(element)) {
 						removeable.add(divided.get(i));
 					} else if ((divided.get(i).length() > 1) && divided.get(i).contains(element.toLowerCase())) {
@@ -203,15 +218,17 @@ public class BDD {
 
 	private Node root = null;
 
-	private String order = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-	private int nodeCount = 0;
+	private String order;
 
 	public int getNodeCount() {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayDeque<Node> queue = new ArrayDeque<>();
 		queue.add(root);
 		Node current;
+		if(root.getLeft()==null)
+		{
+			return 0;
+		}
 		while(!queue.isEmpty())
 		{
 			current = queue.remove();
@@ -242,19 +259,26 @@ public class BDD {
 			current = queue.remove();
 			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol() + " Instance: "
 					+ current.toString());
-			System.out.println("Left: " + current.getLeft().getFunction());
-			System.out.println("Right: " + current.getRight().getFunction());
-			if ((current.getLeft().getFunction() != "0") && (current.getLeft().getFunction() != "1")) {
-				queue.add(current.getLeft());
-			}
-			if ((current.getRight().getFunction() != "0") && (current.getRight().getFunction() != "1")) {
-				queue.add(current.getRight());
+			if(current.getLeft()!=null)
+			{
+				System.out.println("Left: " + current.getLeft().getFunction());
+				System.out.println("Right: " + current.getRight().getFunction());
+				if ((current.getLeft().getFunction() != "0") && (current.getLeft().getFunction() != "1")) {
+					queue.add(current.getLeft());
+				}
+				if ((current.getRight().getFunction() != "0") && (current.getRight().getFunction() != "1")) {
+					queue.add(current.getRight());
+				}
 			}
 		}
 	}
 
 	public char use(final String inputs) {
 		Node current = root;
+		if(root.getLeft()==null)
+		{
+			return current.getFunction().charAt(0);
+		}
 		while ((current.getFunction() != "0") && (current.getFunction() != "1")) {
 			if (inputs.charAt(order.indexOf(current.getSymbol().charAt(0))) == '0') {
 				current = current.getLeft();
