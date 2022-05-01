@@ -4,36 +4,30 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class BDD {
-	
+
 	public static BDD BDD_create(final String bfunkcia, final String poradie) {
 		final String function = reduceFunction(formatInput(bfunkcia, poradie));
-		final Node root = new Node(function, "" + poradie.charAt(0),null);
+		final Node root = new Node(function, "" + poradie.charAt(0), null);
 		final ArrayDeque<Node> queue = new ArrayDeque<>();
-		final ArrayList<Node> allNodes  = new ArrayList<Node>();
+		final ArrayList<Node> allNodes = new ArrayList<>();
 		queue.add(root);
 		while (!queue.isEmpty()) {
 			final Node current = queue.remove();
-			Boolean skip = false;
-			int count = 0;
-			for(Node node:allNodes)
-			{
-				if(node.getFunction().equals(current.getFunction()))
-				{
-					
-						System.out.println("Current: "+current.getFunction() + " matches :" + node.getFunction());
-						if(current.getParent().getLeft().equals(current))
-						{
-							current.getParent().setLeft(node);
-						}
-						else
-						{
-							current.getParent().setRight(node);
-						}
-						skip = true;
+			boolean skip = false;
+			final int count = 0;
+			for (final Node node : allNodes) {
+				if (node.getFunction().equals(current.getFunction())) {
+
+					System.out.println("Current: " + current.getFunction() + " matches :" + node.getFunction());
+					if (current.getParent().getLeft().equals(current)) {
+						current.getParent().setLeft(node);
+					} else {
+						current.getParent().setRight(node);
+					}
+					skip = true;
 				}
 			}
-			if(skip)
-			{
+			if (skip) {
 				continue;
 			}
 			Node left = null;
@@ -41,25 +35,25 @@ public class BDD {
 			final String leftFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol().toLowerCase());
 			final String rightFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol());
 			if ((leftFunction == "0") || (leftFunction == "1")) {
-				left = new Node(leftFunction,"*",current);
+				left = new Node(leftFunction, "*", current);
 			} else {
 				for (int i = 0; i < poradie.length(); i++) {
 					if (leftFunction.contains(("" + poradie.charAt(i)).toLowerCase())
 							|| leftFunction.contains(("" + poradie.charAt(i)))) {
 						left = new Node(getFunctionForSymbol(current.getFunction(), current.getSymbol().toLowerCase()),
-								"" + poradie.charAt(i),current);
+								"" + poradie.charAt(i), current);
 						break;
 					}
 				}
 			}
 			if ((rightFunction == "0") || (rightFunction == "1")) {
-				right = new Node(rightFunction, "*",current);
+				right = new Node(rightFunction, "*", current);
 			} else {
 				for (int i = 0; i < poradie.length(); i++) {
 					if (rightFunction.contains("" + poradie.charAt(i))
 							|| rightFunction.contains(("" + poradie.charAt(i)).toLowerCase())) {
 						right = new Node(getFunctionForSymbol(current.getFunction(), current.getSymbol()),
-								"" + poradie.charAt(i),current);
+								"" + poradie.charAt(i), current);
 						break;
 					}
 				}
@@ -68,16 +62,12 @@ public class BDD {
 				if (!left.getFunction().equals("0") && !left.getFunction().equals("1")) {
 					queue.add(left);
 				}
-				if(current.getParent() != null)
-				{
-				if(current.getParent().getLeft() == current)
-				{
-					current.getParent().setLeft(left);
-				}
-				else
-				{
-					current.getParent().setRight(left);
-				}
+				if (current.getParent() != null) {
+					if (current.getParent().getLeft() == current) {
+						current.getParent().setLeft(left);
+					} else {
+						current.getParent().setRight(left);
+					}
 				}
 			} else {
 				if (!left.getFunction().equals("0") && !left.getFunction().equals("1")) {
@@ -94,9 +84,13 @@ public class BDD {
 			System.out.println("Left: " + left.getFunction());
 			System.out.println("Right: " + right.getFunction());
 		}
-		char charArray[] = poradie.toCharArray();
-	    Arrays.sort(charArray);
+		final char charArray[] = poradie.toCharArray();
+		Arrays.sort(charArray);
 		return new BDD(root, new String(charArray));
+	}
+
+	public static char BDD_use(final BDD bdd, final String vstupy) {
+		return bdd.use(vstupy);
 	}
 
 	private static String formatInput(final String function, final String order) {
@@ -125,8 +119,12 @@ public class BDD {
 		}
 		divided.add(tmp);
 		String followingFunction = "";
-		if (reduced.equals(symbol) || reduced.equals(symbol.toLowerCase())) {
+		if (reduced.equals(symbol)) {
 			return "1";
+		}
+		else if(reduced.equals(symbol.toLowerCase()))
+		{
+			return "0";
 		}
 		if (reduced.equals(symbol.toUpperCase())) {
 			return "0";
@@ -193,9 +191,8 @@ public class BDD {
 		}
 		divided.removeAll(removeable);
 		reduced = "";
-		for(String element:divided)
-		{
-			reduced+=element+"+";
+		for (final String element : divided) {
+			reduced += element + "+";
 		}
 		if (reduced.isBlank()) {
 			return "";
@@ -204,55 +201,64 @@ public class BDD {
 		return reduced;
 	}
 
-	public static char BDD_use(BDD bdd, String vstupy)
-	{
-		return bdd.use(vstupy);
-	}
-	
 	private Node root = null;
-	
+
 	private String order = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	private final int nodeCount = 0;
+	private int nodeCount = 0;
 
-	public BDD(final Node root, final String order) {
-		this.root = root;
-		this.order = order;
-	}
-	
-	public void printTree()
-	{
+	public int getNodeCount() {
+		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayDeque<Node> queue = new ArrayDeque<>();
 		queue.add(root);
 		Node current;
 		while(!queue.isEmpty())
 		{
 			current = queue.remove();
-			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol() + " Instance: " + current.toString());
-			System.out.println("Left: " + current.getLeft().getFunction());
-			System.out.println("Right: " + current.getRight().getFunction());
-			if(current.getLeft().getFunction() != "0" && current.getLeft().getFunction()!= "1")
+			if(!nodes.contains(current))
 			{
+				nodes.add(current);
+			}
+			if ((current.getLeft().getFunction() != "0") && (current.getLeft().getFunction() != "1")) {
 				queue.add(current.getLeft());
 			}
-			if(current.getRight().getFunction() != "0" && current.getRight().getFunction()!= "1")
-			{
+			if ((current.getRight().getFunction() != "0") && (current.getRight().getFunction() != "1")) {
+				queue.add(current.getRight());
+			}
+		}
+		return nodes.size();
+	}
+
+	public BDD(final Node root, final String order) {
+		this.root = root;
+		this.order = order;
+	}
+
+	public void printTree() {
+		final ArrayDeque<Node> queue = new ArrayDeque<>();
+		queue.add(root);
+		Node current;
+		while (!queue.isEmpty()) {
+			current = queue.remove();
+			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol() + " Instance: "
+					+ current.toString());
+			System.out.println("Left: " + current.getLeft().getFunction());
+			System.out.println("Right: " + current.getRight().getFunction());
+			if ((current.getLeft().getFunction() != "0") && (current.getLeft().getFunction() != "1")) {
+				queue.add(current.getLeft());
+			}
+			if ((current.getRight().getFunction() != "0") && (current.getRight().getFunction() != "1")) {
 				queue.add(current.getRight());
 			}
 		}
 	}
-	
-	public char use(String inputs)
-	{
+
+	public char use(final String inputs) {
 		Node current = root;
-		while(current.getFunction() != "0" && current.getFunction() != "1")
-		{
-			if(inputs.charAt(order.indexOf(current.getSymbol().charAt(0))) == '0')
-			{
+		while ((current.getFunction() != "0") && (current.getFunction() != "1")) {
+			if (inputs.charAt(order.indexOf(current.getSymbol().charAt(0))) == '0') {
 				current = current.getLeft();
-			}
-			else
-			{
+			} else {
 				current = current.getRight();
 			}
 		}
