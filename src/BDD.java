@@ -10,6 +10,8 @@ public class BDD {
 		Node root = new Node(function, "" + poradie.charAt(0), null);
 		final ArrayDeque<Node> queue = new ArrayDeque<>();
 		final ArrayList<Node> allNodes = new ArrayList<>();
+		final Node zeroNode = new Node("0","*",null);
+		final Node oneNode = new Node("1","*",null);
 		queue.add(root);
 		while (!queue.isEmpty()) {
 			final Node current = queue.remove();
@@ -35,8 +37,11 @@ public class BDD {
 			final String leftFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol().toLowerCase());
 			final String rightFunction = getFunctionForSymbol(current.getFunction(), current.getSymbol());
 			//If the left function is a termination add no symbol, else find next symbol found in fuction
-			if ((leftFunction == "0") || (leftFunction == "1")) {
-				left = new Node(leftFunction, "*", current);
+			if (leftFunction == "0") {
+				left = zeroNode;
+			}
+			else if(leftFunction == "1") {
+				left = oneNode;
 			} else {
 				for (int i = 0; i < poradie.length(); i++) {
 					if (leftFunction.contains(("" + poradie.charAt(i)).toLowerCase())
@@ -48,8 +53,12 @@ public class BDD {
 				}
 			}
 			//If the right function is a termination add no symbol, else find next symbol found in fuction
-			if ((rightFunction == "0") || (rightFunction == "1")) {
-				right = new Node(rightFunction, "*", current);
+			if (rightFunction == "0")
+			{
+				right = zeroNode;
+			}
+			else if (rightFunction == "1") {
+				right = oneNode;
 			} else {
 				for (int i = 0; i < poradie.length(); i++) {
 					if (rightFunction.contains("" + poradie.charAt(i))

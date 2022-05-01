@@ -7,28 +7,28 @@ public class main {
 		bdd.printTree();
 		System.out.println("------------FUCK------------");
 		//System.out.println(BDD.BDD_use(bdd, "1001"));
-		if (BDD.BDD_use(bdd, "000") != '0') {
+		if (BDD.BDD_use(bdd, "00000") != '0') {
 			System.out.print("Te retard 1");
 		}
-		if (BDD.BDD_use(bdd, "001") != '1') {
+		if (BDD.BDD_use(bdd, "00100") != '1') {
 			System.out.print("Te retard 2");
 		}
-		if (BDD.BDD_use(bdd, "010") != '0') {
+		if (BDD.BDD_use(bdd, "01000") != '0') {
 			System.out.print("Te retard 3");
 		}
-		if (BDD.BDD_use(bdd, "011") != '1') {
+		if (BDD.BDD_use(bdd, "01100") != '1') {
 			System.out.print("Te retard 4");
 		}
-		if (BDD.BDD_use(bdd, "100") != '0') {
+		if (BDD.BDD_use(bdd, "10000") != '0') {
 			System.out.print("Te retard 5");
 		}
-		if (BDD.BDD_use(bdd, "101") != '1') {
+		if (BDD.BDD_use(bdd, "10100") != '1') {
 			System.out.print("Te retard 6");
 		}
-		if (BDD.BDD_use(bdd, "110") != '1') {
+		if (BDD.BDD_use(bdd, "11000") != '1') {
 			System.out.print("Te retard 7");
 		}
-		if (BDD.BDD_use(bdd, "111") != '1') {
+		if (BDD.BDD_use(bdd, "11100") != '1') {
 			System.out.print("Te retard 8");
 		}
 		System.out.println("Node count: " + bdd.getNodeCount());
