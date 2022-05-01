@@ -95,9 +95,9 @@ public class BDD {
 				current.setRight(right);
 				allNodes.add(current);
 			}
-			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol());
-			System.out.println("Left: " + left.getFunction());
-			System.out.println("Right: " + right.getFunction());
+//			System.out.println("Root: " + current.getFunction() + " Symbol: " + current.getSymbol());
+//			System.out.println("Left: " + left.getFunction());
+//			System.out.println("Right: " + right.getFunction());
 		}
 		final char charArray[] = poradie.toCharArray();
 		Arrays.sort(charArray);
